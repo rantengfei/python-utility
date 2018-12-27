@@ -28,8 +28,21 @@ AIBILI_PRIVATE_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource
 LOGIN_PUBLIC_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/login_public.crt")
 LOGIN_PRIVATE_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/login_private.pem")
 
+YAOYONGQIAN_PUB_PATH = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/master-public.pem')
+YAOYONGQIAN_PRIV_PATH = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/master-private.pem')
+YAOYONGQIAN_PUB_PATH_ZA = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/capital/zapub.crt')
+YAOYONGQIAN_CHANNEL_PRIVATE = os.path.join(cur_file_path,'resource/rsakey/channel/test/channel-private.pem')
+YAOYONGQIAN_CHANNEL_PUBKEY = os.path.join(cur_file_path,'resource/rsakey/channel/test/channel-public.pem')
+
 key_path = {"AIBILI_PUBLIC_KEY_PATH": AIBILI_PUBLIC_KEY_PATH, "AIBILI_PRIVATE_KEY_PATH": AIBILI_PRIVATE_KEY_PATH,
             "LOGIN_PUBLIC_KEY_PATH": LOGIN_PUBLIC_KEY_PATH, "LOGIN_PRIVATE_KEY_PATH": LOGIN_PRIVATE_KEY_PATH}
+
+yaoyongqian_path = { "YAOYONGQIAN_PUB_PATH": YAOYONGQIAN_PUB_PATH,
+                     "YAOYONGQIAN_PRIV_PATH": YAOYONGQIAN_PRIV_PATH,
+                     "YAOYONGQIAN_PUB_PATH_ZA": YAOYONGQIAN_PUB_PATH_ZA,
+                     "YAOYONGQIAN_CHANNEL_PUBKEY": YAOYONGQIAN_CHANNEL_PUBKEY,
+                     "YAOYONGQIAN_CHANNEL_PRIVATE": YAOYONGQIAN_CHANNEL_PRIVATE}
+key_path.update(yaoyongqian_path)
 
 # 加密
 def encrypt(data, pub_key_path='AIBILI_PUBLIC_KEY_PATH', default_length=117):
