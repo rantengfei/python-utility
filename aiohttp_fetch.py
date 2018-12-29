@@ -4,6 +4,11 @@ import logging.config
 import uuid
 import asyncio
 
+"""
+使用方法：
+1、使用此工具类时，必须先引入logging_setting工具类
+2、将该工具类放到项目util里
+"""
 
 # 60 seconds default timeout
 DEFAULT_TIMEOUT = 60

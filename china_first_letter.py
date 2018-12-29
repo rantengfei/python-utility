@@ -1,6 +1,5 @@
-import re
-
 # 中文获取首字母
+
 
 def single_get_first(unicode1):
     str1 = unicode1.encode('gbk')

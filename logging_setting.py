@@ -2,8 +2,25 @@
 logging setting
 """
 
+"""
+使用方法：
+1、将该工具类放到项目util里
+2、在项目run.py
+  (1)引入logging.config，logging_setting：
+     import logging.config
+     from utils.logging_setting import LOGGING_DIC
+  (2)启动时加载
+     logging.config.dictConfig(LOGGING_DIC)
+     logger = logging.getLogger(__name__)
+  (3)在该类中引入日志文件路径
+3、示例
+  logging.info(f'"HQ_REQUEST", {uuid.uuid1().hex}, {request.url}, {request.method}, {None}, 404！')
+"""
+
+
 import logging.config
-from config import LOG_FILE_H5 as LOG_FILE, ERROR_LOG_FILE_H5 as ERROR_LOG_FILE
+# 日志文件路径
+# from config import LOG_FILE_H5 as LOG_FILE, ERROR_LOG_FILE_H5 as ERROR_LOG_FILE
 
 
 standard_format = '[%(asctime)s] [%(levelname)s] [%(thread)d] [%(filename)s:%(lineno)d] [%(message)s]'
