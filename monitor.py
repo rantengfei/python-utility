@@ -29,7 +29,7 @@ config = None
      默认key:(redis: REDIS_CONFIG, rabbit_mq: RABBIT_MQ, database: DB_CONFIG, mongodb: MONGODB)
      monitor.config = monitor.from_config(config)
      如key不一致，须传入映射
-     monitor.config = monitor.from_config(config, DB_CONFIG="MYSQL_DB_CONFIG")
+     monitor.config = monitor.from_config(config, MYSQL_DB_CONFIG="DB_CONFIG")
   (3)注册工具类的蓝图
      app.blueprint(monitor.monitor)
 3、测试
