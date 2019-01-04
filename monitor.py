@@ -26,10 +26,10 @@ config = None
   (1)引入该工具类： 
      from utils import monitor
   (2)将config传入monitor,
-     默认key:(redis: REDIS_CONFIG, rabbit_mq: RABBIT_MQ, mysql: MYSQL_DB_CONFIG, mongodb: MONGODB)
+     默认key:(redis: REDIS_CONFIG, rabbit_mq: RABBIT_MQ, database: DB_CONFIG, mongodb: MONGODB)
      monitor.config = monitor.from_config(config)
      如key不一致，须传入映射
-     monitor.config = monitor.from_config(config, REDIS_CONFIG="REDIS_CONFIG1")
+     monitor.config = monitor.from_config(config, DB_CONFIG="MYSQL_DB_CONFIG")
   (3)注册工具类的蓝图
      app.blueprint(monitor.monitor)
 3、测试
@@ -60,10 +60,10 @@ def mq(request):
     return ok(connection)
 
 
-@monitor.get("/mysql_master")
-def mysql_master(request):
+@monitor.get("/db_master")
+def db_master(request):
     try:
-        db_config = config.get("MYSQL_DB_CONFIG")[0].get("master")
+        db_config = config.get("DB_CONFIG")[0].get("master")
         connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         sql = f"SELECT TABLE_NAME,TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='{db_config.get('db')}';"
@@ -76,10 +76,10 @@ def mysql_master(request):
     return ok(result)
 
 
-@monitor.get("/mysql_slave")
-def mysql_slave(request):
+@monitor.get("/db_slave")
+def db_slave(request):
     try:
-        db_config = config.get("MYSQL_DB_CONFIG")[0].get("master")
+        db_config = config.get("DB_CONFIG")[0].get("master")
         connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         sql = f"SELECT TABLE_NAME,TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='{db_config.get('db')}';"
