@@ -20,38 +20,14 @@ from rsa import PublicKey, transform, core
 """
 
 
-cur_file_path = os.path.dirname(os.path.realpath(__file__))
-
-AIBILI_PUBLIC_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/aibili_public.crt")
-AIBILI_PRIVATE_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/aibili_private.pem")
-
-LOGIN_PUBLIC_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/login_public.crt")
-LOGIN_PRIVATE_KEY_PATH = os.path.join(os.path.dirname(cur_file_path), "resource/aibili/login_private.pem")
-
-YAOYONGQIAN_PUB_PATH = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/master-public.pem')
-YAOYONGQIAN_PRIV_PATH = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/master-private.pem')
-YAOYONGQIAN_PUB_PATH_ZA = os.path.join(cur_file_path, os.pardir, 'resource/rsakey/capital/zapub.crt')
-YAOYONGQIAN_CHANNEL_PRIVATE = os.path.join(cur_file_path,'resource/rsakey/channel/test/channel-private.pem')
-YAOYONGQIAN_CHANNEL_PUBKEY = os.path.join(cur_file_path,'resource/rsakey/channel/test/channel-public.pem')
-
-key_path = {"AIBILI_PUBLIC_KEY_PATH": AIBILI_PUBLIC_KEY_PATH, "AIBILI_PRIVATE_KEY_PATH": AIBILI_PRIVATE_KEY_PATH,
-            "LOGIN_PUBLIC_KEY_PATH": LOGIN_PUBLIC_KEY_PATH, "LOGIN_PRIVATE_KEY_PATH": LOGIN_PRIVATE_KEY_PATH}
-
-yaoyongqian_path = { "YAOYONGQIAN_PUB_PATH": YAOYONGQIAN_PUB_PATH,
-                     "YAOYONGQIAN_PRIV_PATH": YAOYONGQIAN_PRIV_PATH,
-                     "YAOYONGQIAN_PUB_PATH_ZA": YAOYONGQIAN_PUB_PATH_ZA,
-                     "YAOYONGQIAN_CHANNEL_PUBKEY": YAOYONGQIAN_CHANNEL_PUBKEY,
-                     "YAOYONGQIAN_CHANNEL_PRIVATE": YAOYONGQIAN_CHANNEL_PRIVATE}
-key_path.update(yaoyongqian_path)
-
 # 加密
-def encrypt(data, pub_key_path='AIBILI_PUBLIC_KEY_PATH', default_length=117):
+def encrypt(data, pub_key_path, default_length=117):
     """
     单次加密串的长度最大为 (key_size/8)-11
     1024bit的证书用100， 2048bit的证书用 200
     """
 
-    with open(key_path.get(pub_key_path), "r") as f:
+    with open(pub_key_path, "r") as f:
         key = f.read()
         # Convert from PEM to DER
         lines = key.replace(" ", '').split()
@@ -89,12 +65,12 @@ def encrypt(data, pub_key_path='AIBILI_PUBLIC_KEY_PATH', default_length=117):
 
 
 # 解密
-def decrypt(data, pri_key_path='AIBILI_PRIVATE_KEY_PATH', default_length=128):
+def decrypt(data, pri_key_path, default_length=128):
     """
     1024bit的证书用128，2048bit证书用256位
     """
 
-    with open(key_path.get(pri_key_path)) as f:
+    with open(pri_key_path) as f:
         key = f.read()
         rsa_key = RSA.importKey(key)
         cipher = Cipher_pkcs1_v1_5.new(rsa_key)
@@ -123,8 +99,8 @@ def decrypt(data, pri_key_path='AIBILI_PRIVATE_KEY_PATH', default_length=128):
 
 
 # 签名
-def generate_signature(data, pri_key_path='AIBILI_PRIVATE_KEY_PATH'):
-    with open(key_path.get(pri_key_path)) as f:
+def generate_signature(data, pri_key_path):
+    with open(pri_key_path) as f:
         key = f.read()
         rsa_key = RSA.importKey(key)
         signer = Signature_pkcs1_v1_5.new(rsa_key)
@@ -136,10 +112,10 @@ def generate_signature(data, pri_key_path='AIBILI_PRIVATE_KEY_PATH'):
 
 
 # 验签
-def verify_signature(result, pub_key_path='AIBILI_PUBLIC_KEY_PATH'):
+def verify_signature(result, pub_key_path):
     sign = result.get("sign").encode()
     data = result.get("data").encode()
-    with open(key_path.get(pub_key_path)) as f:
+    with open(pub_key_path) as f:
         key = f.read()
         # Convert from PEM to DER
         lines = key.replace(" ", '').split()
@@ -188,19 +164,5 @@ def decrypt_with_public_key(decrypt_key_file, cipher_text):
 
 
 if __name__ == '__main__':
-    data = '''NPUkyWNhTRDq7Q573/ASwJs9jE/JoOmiSTH5mAa68npU6H5FeBvnbUNlCsYwZ8nD7yS9E/L1il/TWFlKOvvB+pWQ+z1sfzunAACONt3wViT6+RvOWEw8W6Ghb00Xif/AY98x4lVo+CoPmtHNPzOlikQJaYwwArXH9VqT4lcleEA='''
-    with open("../resource/aibili/aibili_private.pem") as f:
-        key = f.read()
-        rsa_key = RSA.importKey(key)
-        cipher = Cipher_pkcs1_v1_5.new(rsa_key)
-        p = base64.b64decode(data.encode())
-        result = ''
-        while True:
-            x = p[0:128]
-            p = p[128:]
-            if x:
-                result += cipher.decrypt(x, "ERROR").decode('utf-8')
-            else:
-                break
-        print(result)
+   pass
 
