@@ -17,7 +17,6 @@ def requests_api(s, url, method="post", params=None, headers=None, timeout=5):
     try:
         result = s.request(method=method, url=url, params=params, headers=headers,
                            json=params, verify=verify, timeout=timeout)
-        print(result)
         if result:
             res = result.json()
         return res
