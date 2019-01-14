@@ -17,10 +17,10 @@ def multipart_encoder(data, boundary=BOUNDARY):
 
     headers = {"content-type": data.content_type}
     data = data.to_string().decode()
-    return {"headers": headers, "data": data}
+    return headers, data
 
 
 if __name__ == "__main__":
-    result = multipart_encoder({"name": "rtf", "gender": "male"})
-    print(f'===============header================: \n {result.get("headers")}')
-    print(f'===============data==================: \n {result.get("data")}')
+    headers, data = multipart_encoder({"name": "rtf", "gender": "male"})
+    print(f'===============headers================: \n{headers}')
+    print(f'===============data==================: \n{data}')
