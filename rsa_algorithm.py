@@ -77,16 +77,16 @@ def decrypt(data, pri_key_path, default_length=128):
         data = base64.b64decode(data.encode())
         length = len(data)
         if length < default_length:
-            decrypt_text = cipher.decrypt(data, 'ERROR')
+            decrypt_text = cipher.decrypt(data, b"ERROR")
             return decrypt_text
         res = []
         offset = 0
         while length - offset > 0:
             if length - offset > default_length:
-                res.append(cipher.decrypt(data[offset:offset + default_length], "ERROR"))
+                res.append(cipher.decrypt(data[offset:offset + default_length], b"ERROR"))
 
             else:
-                res.append(cipher.decrypt(data[offset:], "ERROR"))
+                res.append(cipher.decrypt(data[offset:], b"ERROR"))
             offset += default_length
         cipher_text = b""
         for r in res:
@@ -137,6 +137,33 @@ def verify_signature(result, pub_key_path):
         return is_verify
 
 
+# 签名、加密结果
+def generate_signature_and_encrypt(data, pri_key_path, pub_key_path):
+    try:
+        curr_ency = encrypt(data, pub_key_path)
+    except Exception as e:
+        return False, "签名失败！"
+
+    try:
+        curr_sign = generate_signature(curr_ency, pri_key_path)
+    except Exception as e:
+        return False, "加密失败！"
+
+    return True, {"data": curr_ency, "sign": curr_sign}
+
+
+# 验签、解密结果
+def verify_signature_and_decrypt(data, pri_key_path, pub_key_path):
+    verify_sign = verify_signature(data, pub_key_path)
+    if verify_sign:
+        try:
+            decrypt_data = decrypt(data.get("data"), pri_key_path)
+            return True, decrypt_data
+        except Exception as e:
+            return False, "解密失败！"
+    else:
+        return False, "验签失败！"
+
 # 公钥解密(Crypto)
 def decrypt_rsa(decrypt_key_file, cipher_text):
     key = open(decrypt_key_file, "rb").read()
@@ -164,5 +191,24 @@ def decrypt_with_public_key(decrypt_key_file, cipher_text):
 
 
 if __name__ == '__main__':
-   pass
+    cur_file_path = os.path.dirname(os.path.realpath(__file__))
+    PUB_KEY_PATH = os.path.join(f"{cur_file_path}/resource/aibili_test_public.crt")
+    PRI_KEY_PATH = os.path.join(f"{cur_file_path}/resource/aibili_test_pri.pem")
+
+    PUBLIC_KEY_PATH = os.path.join(f"{cur_file_path}/resource/aibili_test_pub.crt")
+    PRIVATE_KEY_PATH = os.path.join(f"{cur_file_path}/resource/aibili_test_private.pem")
+    print(PRIVATE_KEY_PATH)
+    data = {"mobile": "18152149829", "gender": "male"}
+    if type(data) == list:
+        data = {"list": data}
+    result, data = generate_signature_and_encrypt(json.dumps(data), PRI_KEY_PATH, PUB_KEY_PATH)
+    print(result, data)
+    if result:
+        data = result
+
+        data = {'data': 'QlMCdrANyJmxRKDYBJ7COdlPl52H+SzLcdM6aQptc/ESJaFSIZHKGIGmpvFyNL6WYHWJst+AQMP664CaxAPc39QJAkj+VY+pBuXlUgVpHlR1h/K7oZ93ZyG9I7gY542NbyWD36a/zQu0GN5N+1CcFwwaIQZz0F/pMGesIRFQD9E=', 'sign': 'WacLPWIfeDmt2XNLG7hxM35afW5l6QHJAjvFwsQLnvx+wh+sQcJWF2NHNl02347tS8HlkZnqhaHV+yai4I+zx5RHd4kmR8rWNqCaBr6KLIFz8NFO8sUxAHgIjHR7iyLRj0EPANGJnUW1GXDy0gt51lmp+wAMp+ckSRUd3Ax7w4E='}
+
+        result, data = verify_signature_and_decrypt(data, PRIVATE_KEY_PATH, PUBLIC_KEY_PATH)
+
+        print(result, data)
 
