@@ -11,9 +11,11 @@
  接口参数验证配置
  接口名：[参数列表]
  参数列表： [参数名，参数类型，是否必传]
- 返回值说明：lack_params：缺少必传参数列表; empty_params: 值为空的参数列表; error_params：数据类型错误参数列表;
+ validate方法参数说明： api: 接口名，params: 参数（json）
+ 返回说明：lack_params：缺少必传参数列表; empty_params: 值为空的参数列表; error_params：数据类型错误参数列表;
            error_api_lists: 参数验证配置错误
 """
+
 API_PARAMS_LIST = {
     "test": [
         ["test_int", int, True], ["test_str", str, True], ["test_list", list, True],
@@ -55,17 +57,16 @@ def validate(api, params):
                 param_name = i[0]
                 param_type = i[1]
                 param_not_null = i[2]
-                params_value = params.get(param_name)
+                param_value = params.get(param_name)
                 if param_name not in params and param_not_null:
                     lack_params.append(param_name)
                 else:
-                    if not value_not_null_process(params_value, param_not_null):
+                    if not value_not_null_process(param_value, param_not_null):
                         empty_params.append(param_name)
-                    validate_value = value_is_null_process(params_value, param_type)
-                    if not validate_value and not isinstance(params_value, param_type):
+                    validate_value = value_is_null_process(param_value, param_type)
+                    if not validate_value and not isinstance(param_value, param_type):
                         if param_name in params:
-                            print(params_value)
-                            if params_value or (not params_value and not param_not_null):
+                            if param_value or (not param_value and not param_not_null):
                                 error_params.append(param_name)
             else:
                 error_api_lists.append(i)
