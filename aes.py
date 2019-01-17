@@ -1,5 +1,4 @@
 import base64
-import json
 from Crypto.Cipher import AES
 from urllib.parse import quote, unquote
 
@@ -63,11 +62,13 @@ def encrypt_key(data):
 
 
 if __name__ == '__main__':
-    data = [1, 2, 3]
+    data = 0
     key = encrypt_key("gsaibili20181231")
     print(f"encrypt_key: {key}")
+
     encrypt_data = encrypt(key, data)
     print(f"encrypt_result: {encrypt_data}")
+
     decrypt_data = decrypt("ScWwbaa0PKIBrjj6yBMZvhfu83py9HPzjTMzuRty/Yo=", encrypt_data)
     print(f"decrypt_result: {decrypt_data} {type(decrypt_data)} ")
 
