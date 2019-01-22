@@ -51,7 +51,7 @@ def remove_redundant_params(req_params, api_params):
 
     new_params = {}
     for k in new_params_keys:
-        new_params[k] = params.get(k)
+        new_params[k] = req_params.get(k)
     return new_params
 
 def validate(api, params):
