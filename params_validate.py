@@ -43,6 +43,17 @@ def value_not_null_process(params_value, param_not_null):
             validate_value = False
     return validate_value
 
+# 移除多余参数
+def remove_redundant_params(req_params, api_params):
+    api_keys = [i[0] for i in api_params]
+    param_keys = list(req_params)
+    new_params_keys = list(set(param_keys).intersection(set(api_keys)))
+
+    new_params = {}
+    for k in new_params_keys:
+        new_params[k] = params.get(k)
+    return new_params
+
 def validate(api, params):
     if not isinstance(params, dict):
         return False, {"return_code": "1003", "return_msg": "参数类型错误!"}
@@ -76,12 +87,14 @@ def validate(api, params):
         if lack_params or empty_params or error_params:
             data = {"lack_params": lack_params, "empty_params": empty_params, "error_params": error_params}
             return False, {"return_code": "1111", "return_msg": data}
-    return True, {"return_code": "0000", "return_msg": "验证通过!"}
+    new_params = remove_redundant_params(params, api_params)
+    return True, {"return_code": "0000", "return_msg": "验证通过!", "params": new_params}
 
 
 if __name__ == "__main__":
-    params = {"test_int": "0", "test_str": "xxx", "test_list": [1, 2, 3], "test_float": 0.1,
-              "test_dict": {"name": "rtf", "gender": "male"}, "test_null": None}
+    params = {"ssss": "ss", "test_int": 0, "test_str": "xxx", "test_list": [1, 2, 3], "test_float": 0.1,
+              "test_dict": {"name": "rtf", "gender": "male"}, "test_null": "", "xxxx": "xx"}
+
     validation, msg = validate("test", params)
     print(validation, msg)
 
