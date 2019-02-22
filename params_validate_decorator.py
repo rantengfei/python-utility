@@ -105,10 +105,13 @@ def validate_params(rule):
                 else:
                     params = request.json
                 result, msg = validate(rule, params)
-                return json(msg)
+                if not result:
+                    return json(msg)
             else:
                 params = dict(bound_values.arguments).get("params")
-                return validate(rule, params)
+                result, msg = validate(rule, params)
+                if not result:
+                    return msg
             return func(*args, **kwargs)
         return wrapper
     return decorate
@@ -126,4 +129,4 @@ def test(params):
 if __name__ == "__main__":
     params = {"ssss": "ss", "test_int": 0, "test_str": "xxx", "test_list": [1, 2, 3], "test_float": 0.1,
               "test_dict": {"name": "rtf", "gender": "male"}, "test_null": "", "xxxx": "xx"}
-    print(test(params))
+    test(params)
