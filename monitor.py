@@ -79,7 +79,7 @@ def db_master(request):
 @monitor.get("/db_slave")
 def db_slave(request):
     try:
-        db_config = config.get("DB_CONFIG")[0].get("master")
+        db_config = config.get("DB_CONFIG")[0].get("slave")
         connection = pymysql.connect(**db_config)
         cursor = connection.cursor()
         sql = f"SELECT TABLE_NAME,TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='{db_config.get('db')}';"
