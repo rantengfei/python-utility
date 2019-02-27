@@ -19,6 +19,7 @@
  2、在函数上@validate_params([["name", str, True], ["gender", str, True], ["age", int, False]])
 """
 
+import asyncio
 from inspect import signature
 from functools import wraps
 from sanic.response import json
@@ -126,7 +127,7 @@ def validate_params(rule):
 
         # Map function argument names to supplied types
         sig = signature(func)
-        import asyncio
+
         if asyncio.iscoroutinefunction(func):
             @wraps(func)
             async def wrapper(*args, **kwargs):
@@ -165,8 +166,6 @@ if __name__ == "__main__":
     params = {"ssss": "ss", "test_int": 0, "test_str": "xxx", "test_list": [1, 2, 3], "test_float": 0.1,
               "test_dict": {"name": "rtf", "gender": "male"}, "test_null": "", "xxxx": "xx"}
     test(params)
-
-    import asyncio
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(test1(params))
