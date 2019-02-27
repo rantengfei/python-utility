@@ -17,6 +17,7 @@
  使用说明：
  1、from utils.params_validate_decorator import validate_params
  2、在函数上@validate_params([["name", str, True], ["gender", str, True], ["age", int, False]])
+    validate_params_async(针对于LS、GET、POST、DELETE、PUT)
 """
 
 from inspect import signature
@@ -51,6 +52,15 @@ def remove_redundant_params(req_params, api_params):
         new_params[k] = req_params.get(k)
     return new_params
 
+def is_conversion_float(value):
+    flag = True
+    try:
+        value = float(value)
+    except:
+        flag = False
+    return flag
+
+
 def validate(rule, params):
     if not isinstance(params, dict):
         return False, {"return_code": "1003", "return_msg": "参数类型错误!"}
@@ -72,7 +82,12 @@ def validate(rule, params):
                         empty_params.append(param_name)
                     validate_value = value_is_null_process(param_value, param_type)
                     if not validate_value and not isinstance(param_value, param_type):
-                        if param_name in params:
+                        flag = True
+                        if param_type == int:
+                            flag = str(param_value).isnumeric()
+                        elif param_type == float:
+                            flag = is_conversion_float(param_value)
+                        if not flag and param_name in params:
                             if param_value or (not param_value and not param_not_null):
                                 error_params.append(param_name)
             else:
@@ -117,6 +132,37 @@ def validate_params(rule):
     return decorate
 
 
+def validate_params_async(rule):
+    def decorate(func):
+        # If in optimized mode, disable type checking
+        if not __debug__:
+            return func
+
+        # Map function argument names to supplied types
+        sig = signature(func)
+
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            bound_values = sig.bind(*args, **kwargs)
+            request = dict(bound_values.arguments).get("request")
+            if request:
+                if request.method == "GET":
+                    params = request.args
+                else:
+                    params = request.json
+                result, msg = validate(rule, params)
+                if not result:
+                    return json(msg)
+            else:
+                params = dict(bound_values.arguments).get("params")
+                result, msg = validate(rule, params)
+                if not result:
+                    return msg
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorate
+
+
 params_rule = [
         ["test_int", int, True], ["test_str", str, True], ["test_list", list, True],
         ["test_dict", dict, True], ["test_float", float, True], ["test_null", str, False]
@@ -126,7 +172,17 @@ def test(params):
     print("xxxxxxx")
 
 
+@validate_params_async(params_rule)
+async def test1(params):
+    print("xxxxxxxtest1")
+
+
 if __name__ == "__main__":
     params = {"ssss": "ss", "test_int": 0, "test_str": "xxx", "test_list": [1, 2, 3], "test_float": 0.1,
               "test_dict": {"name": "rtf", "gender": "male"}, "test_null": "", "xxxx": "xx"}
     test(params)
+
+    import asyncio
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test1(params))
